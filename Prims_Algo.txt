@@ -1,0 +1,3063 @@
+'PASTE THIS INTO YOUR CURRENT WORKBOOK'S (Excel sheet's) MODULE ( HEAD RIBBON -> DEVELOPER -> VISUAL BASIC -> PROJECT-VBAPROJECT -> VBAProject -> Modules -> Module1 ) AND CLICK ON SAVE AND SAVE CURRENT FILE WITH EXTENSION OF .XLSM ( i.e. Macro enabled )
+'ASSIGN SHORTCUT OF Ctrl + j to macro name Home_Welcome
+'SHORTCUT ASSIGN : HEAD RIBBON -> DEVELOPER -> MACROS -> Selelct macro named Home_Welcome -> Click on Options(right side) -> put "j" in next to ctrl -> Press Ok
+'Now PRESS Ctrl + j AND ENJOY INTERFACE
+
+Option Explicit
+
+Public size_of_file_to_be_created As Integer
+
+
+Function Check_input_no_of_edges()
+'
+' for check out value given in column of number of edges
+'
+Dim true_false As Boolean
+
+true_false = True
+
+If IsNumeric(Range("L15")) Then
+    If Range("L15").Value < 1 Then
+    true_false = False
+    Dim answer As VbMsgBoxResult
+    answer = MsgBox("Please provide a integer value of greater than or equal to 1 !", vbOKOnly, "Action Needed !")
+    Range("L15").Value = ""
+    End If
+Else
+    true_false = False
+    Dim Answer_1 As VbMsgBoxResult
+    Answer_1 = MsgBox("Please enter a Integer value !", vbOKOnly, "Action Needed !")
+    Range("L15").Value = ""
+End If
+
+Check_input_no_of_edges = true_false
+
+End Function
+
+Function Check_input_no_of_nodes()
+'
+' for check out value given in column of number of nodes
+'
+Dim true_false As Boolean
+
+true_false = True
+
+If IsNumeric(Range("L15")) Then
+    If Range("L15").Value < 2 Then
+    true_false = False
+    Dim answer As VbMsgBoxResult
+    answer = MsgBox("Please provide a integer value of greater than or equal to 2 !", vbOKOnly, "Action Needed !")
+    Range("L15").Value = ""
+    End If
+Else
+    true_false = False
+    Dim Answer_1 As VbMsgBoxResult
+    Answer_1 = MsgBox("Please enter a Integer value !", vbOKOnly, "Action Needed !")
+    Range("L15").Value = ""
+End If
+
+Check_input_no_of_nodes = true_false
+
+End Function
+
+Function check_input_given_to_matrix_node()
+'
+'Weight of any edge should be only positive integer others should be give warning
+'
+    
+    Dim true_false As Boolean
+
+    true_false = True
+
+    Dim num As Integer, num1 As Integer, num2 As Integer, num3 As Integer, str_no As String, number_of_nodes As Integer, temp As Integer, value_hold As Variant
+    
+    temp = 0
+    number_of_nodes = size_of_file_to_be_created
+    
+    For num = 1 To number_of_nodes
+        num1 = num + 12
+        For num2 = 1 To number_of_nodes
+            num3 = Asc("G") + num2
+            str_no = Chr(num3)
+            value_hold = Range(str_no & num1).Value
+            If value_hold <> "" And value_hold <> 0 Then
+                If IsNumeric(value_hold) Then
+                    If value_hold < 0 Then
+                        true_false = False
+                        Dim answer As VbMsgBoxResult
+                        answer = MsgBox("Please provide edge weight value greater than 0 for node " & num2 & " corresponding to node " & num, vbOKOnly, "Action Needed !")
+                        Range(str_no & num1).Value = ""
+                    End If
+                Else
+                    true_false = False
+                    Dim Answer_1 As VbMsgBoxResult
+                    Answer_1 = MsgBox("Please enter edge weight value as positive real number value for node " & num2 & " corresponding to node " & num, vbOKOnly, "Action Needed !")
+                    Range(str_no & num1).Value = ""
+                End If
+            End If
+        Next
+    Next
+
+    check_input_given_to_matrix_node = true_false
+    
+End Function
+
+Function check_input_given_to_matrix_edge()
+'
+'Weight of any edge should be only positive integer others should be give warning
+'
+
+Dim true_false As Boolean
+
+true_false = True
+
+Dim num_r1 As Integer, i As Integer, value_hold As Variant
+num_r1 = 0
+
+For i = 1 To size_of_file_to_be_created
+    num_r1 = i + 12
+    value_hold = Worksheets("Edges_Table").Range("J" & num_r1).Value
+    If IsNumeric(value_hold) Then
+        If value_hold < 0 Then
+            true_false = False
+            Dim answer As VbMsgBoxResult
+            answer = MsgBox("Please provide a edge weight value greater than 0 for serial number " & i, vbOKOnly, "Action Needed !")
+            Range("J" & num_r1).Value = ""
+        End If
+    Else
+        true_false = False
+        Dim Answer_1 As VbMsgBoxResult
+        Answer_1 = MsgBox("Please enter a positive real number value for edge weight corresponding to serial number " & i, vbOKOnly, "Action Needed !")
+        Range("J" & num_r1).Value = ""
+    End If
+Next
+
+check_input_given_to_matrix_edge = true_false
+
+End Function
+
+Sub No_node_input()
+'
+' macro_test2 Macro
+' This is for input of number of nodes
+'
+
+'
+    'make a new sheet
+    Dim element As Variant
+    'below code is for supress warning of permanent deletion
+    Application.DisplayAlerts = False
+    For Each element In ThisWorkbook.Worksheets
+        If element.Name = "Input_nodes" Then
+            element.Delete
+            Exit For
+        End If
+    Next
+    Sheets.Add after:=ActiveSheet
+    ActiveSheet.Name = "Input_nodes"
+    'now warning should be enabled if there is any other warning then we should see those
+    Application.DisplayAlerts = True
+    'style remove grid lines
+    ActiveWindow.DisplayHeadings = False
+    ActiveWindow.DisplayGridlines = False
+    
+    'style for page
+    Columns("L:L").ColumnWidth = 20
+    Range("K9:M9").Select
+    Selection.Merge
+    Range("K9:M9").Select
+    ActiveCell.FormulaR1C1 = ": Enter Data :"
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 20
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 0, 0)
+        .ThemeFont = xlThemeFontMinor
+        .Italic = True
+    End With
+    Range("I11:O11").Select
+    Selection.Merge
+    Range("I11:O11").Select
+    ActiveCell.FormulaR1C1 = "Enter the number of Nodes you want as Input :"
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 18
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 255, 255)
+        .ThemeFont = xlThemeFontMinor
+        .Italic = True
+    End With
+    Rows("15:15").RowHeight = 35
+    Range("L15").Select
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    With Selection.Font
+        .Color = RGB(255, 0, 0)
+    End With
+    Range("H5:P25").Select
+    With Selection.Interior
+        .PatternColorIndex = xlAutomatic
+        .Color = 49407
+    End With
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    ActiveSheet.Shapes.AddShape(msoShapeRoundedRectangle, 512.5, 300, 141, 39.6). _
+        Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = "SUBMIT"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 6). _
+        ParagraphFormat
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 6).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Size = 14
+    With Selection.ShapeRange(1).Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(255, 0, 0)
+        .Solid
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Reflection.Type = msoReflectionType3
+    Selection.OnAction = "table_creation_nodes"
+    Range("L15").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .Color = RGB(255, 255, 255)
+    End With
+    Range("A1").Select
+End Sub
+Sub No_edges_input()
+'
+' macro_test2 Macro
+' This is for input of number of edges
+'
+
+'
+    'make a new sheet
+    Dim element As Variant
+    'below code is for supress warning of permanent deletion
+    Application.DisplayAlerts = False
+    For Each element In ThisWorkbook.Worksheets
+        If element.Name = "Input_edges" Then
+            element.Delete
+            Exit For
+        End If
+    Next
+    Sheets.Add after:=ActiveSheet
+    ActiveSheet.Name = "Input_edges"
+    'now warning should be enabled if there is any other warning then we should see those
+    Application.DisplayAlerts = True
+    'style remove grid lines
+    ActiveWindow.DisplayHeadings = False
+    ActiveWindow.DisplayGridlines = False
+    
+    'style for page
+    Columns("L:L").ColumnWidth = 20
+    Range("K9:M9").Select
+    Selection.Merge
+    Range("K9:M9").Select
+    ActiveCell.FormulaR1C1 = ": Enter Data :"
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 20
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 0, 0)
+        .ThemeFont = xlThemeFontMinor
+        .Italic = True
+    End With
+    Range("I11:O11").Select
+    Selection.Merge
+    Range("I11:O11").Select
+    ActiveCell.FormulaR1C1 = "Enter the number of Edges you want as Input :"
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 18
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 255, 255)
+        .ThemeFont = xlThemeFontMinor
+        .Italic = True
+    End With
+    Rows("15:15").RowHeight = 35
+    Range("L15").Select
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    With Selection.Font
+        .Color = RGB(255, 0, 0)
+    End With
+    Range("H5:P25").Select
+    With Selection.Interior
+        .PatternColorIndex = xlAutomatic
+        .Color = 49407
+    End With
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    ActiveSheet.Shapes.AddShape(msoShapeRoundedRectangle, 512.5, 300, 141, 39.6). _
+        Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = "SUBMIT"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 6). _
+        ParagraphFormat
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 6).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Size = 14
+    With Selection.ShapeRange(1).Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(255, 0, 0)
+        .Solid
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Reflection.Type = msoReflectionType3
+    Selection.OnAction = "table_creation_edges"
+    Range("L15").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .Color = RGB(255, 255, 255)
+    End With
+    Range("A1").Select
+End Sub
+
+
+Sub table_creation_edges()
+
+    'check whether given input was a valid integer or not
+    Dim run_or_not As Boolean
+    run_or_not = Check_input_no_of_edges()
+    If run_or_not = False Then
+        Exit Sub
+    End If
+       
+    'this is for create a automatic table for taking edges values
+    'ACTION DETERMINE STEP
+    
+    'here trying to find whether there is "Edges_Table" named sheet is present or not. If present and only want to refresh then cell are cleared
+    'if coming again from fill_form then previous would be deleted and new will be created
+    
+    Dim element As Variant
+    
+    If ActiveSheet.Name = "Edges_Table" Then
+        Sheets("Edges_Table").Cells.Clear
+        Dim shp As Shape
+        For Each shp In ActiveSheet.Shapes
+            shp.Delete
+        Next shp
+    Else
+        'below code is for supress warning of permanent deletion
+        Application.DisplayAlerts = False
+        For Each element In ThisWorkbook.Worksheets
+            If element.Name = "Edges_Table" Then
+                element.Delete
+                Exit For
+            End If
+        Next
+        Sheets.Add after:=ActiveSheet
+        ActiveSheet.Name = "Edges_Table"
+        'now warning should be enabled if there is any other warning then we should see those
+        Application.DisplayAlerts = True
+    End If
+    
+    ActiveWindow.DisplayHeadings = False
+    ActiveWindow.DisplayGridlines = False
+    
+    'for number of rows in table
+    Dim number_of_rows As Integer
+    number_of_rows = Worksheets("Input_edges").Range("L15").Value
+    size_of_file_to_be_created = number_of_rows
+    
+    Rows("4:4").RowHeight = 20
+    Rows("11:11").RowHeight = 20
+    
+
+    'Add refresh button
+    
+    ActiveSheet.Shapes.AddShape(msoShapeRectangle, 279.6, 225 + size_of_file_to_be_created * 15, 60, 30).Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange.TextFrame2.TextRange.ParagraphFormat.Alignment = _
+        msoAlignCenter
+    With Selection.ShapeRange.Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(255, 0, 0)
+        .Solid
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = "REFRESH"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 7). _
+        ParagraphFormat
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 7).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    Selection.OnAction = "table_creation_edges"
+    
+    'button code ended
+    
+    'Add solution button
+    
+    ActiveSheet.Shapes.AddShape(msoShapeRectangle, 440, 225 + size_of_file_to_be_created * 15, 60, 30).Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange.TextFrame2.TextRange.ParagraphFormat.Alignment = _
+        msoAlignCenter
+    With Selection.ShapeRange.Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(255, 0, 0)
+        .Solid
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = "FIND SOLUTION"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 7). _
+        ParagraphFormat
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 7).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    Selection.OnAction = "solution_feeder"
+    
+    'button code ended
+    
+    
+    
+    'HEADING PART STARTED HERE
+    
+    Range("G3").Select
+    ActiveCell.FormulaR1C1 = "::  ENTER VALUES FOR WEIGHT OF EDGES  ::"
+    Range("G3:J3").Select
+    Selection.Merge
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 20
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 255, 255)
+        .ThemeFont = xlThemeFontMinor
+    End With
+    
+    'HEADING ENDED HERE
+    
+    
+    
+    'NOTICE PART STARTED HERE
+    
+    'NOTICE HEADING
+    Range("G6").Select
+    ActiveCell.FormulaR1C1 = "NOTE :"
+    Range("G6:J6").Select
+    Selection.Merge
+    With Selection
+        .HorizontalAlignment = xlLeft
+        .VerticalAlignment = xlCenter
+        .WrapText = False
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 15
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(128, 0, 0)
+        .ThemeFont = xlThemeFontMinor
+    End With
+    
+    'NOTICE 1
+    Range("G7").Select
+    ActiveCell.FormulaR1C1 = "1. Start index is the node where edge is starting"
+    Range("G7:J7").Select
+    Selection.Merge
+    With Selection
+        .HorizontalAlignment = xlLeft
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 15
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(128, 0, 0)
+        .ThemeFont = xlThemeFontMinor
+    End With
+    
+    'NOTICE 2
+    Range("G8").Select
+    ActiveCell.FormulaR1C1 = "2. End index is the node where edge is ending"
+    Range("G8:J8").Select
+    Selection.Merge
+    With Selection
+        .HorizontalAlignment = xlLeft
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 15
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(128, 0, 0)
+        .ThemeFont = xlThemeFontMinor
+    End With
+    
+    'NOTICE 3
+    Range("G9").Select
+    '3. Prim's Algorithm is applicable for non-directional edges hence it does not matter which is a starting node or ending node so it's your choice that whom you define starting or ending node.
+    ActiveCell.FormulaR1C1 = "3. Prim's Algorithm is applicable for non-directional edges hence it does not matter which is a"
+    Range("G9:K9").Select
+    Selection.Merge
+    With Selection
+        .HorizontalAlignment = xlLeft
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 15
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(128, 0, 0)
+        .ThemeFont = xlThemeFontMinor
+    End With
+    
+    Range("G10").Select
+    '3. Prim's Algorithm is applicable for non-directional edges hence it does not matter which is a starting node or ending node so it's your choice that whom you define starting or ending node.
+    ActiveCell.FormulaR1C1 = "starting node or ending node so it's your choice that whom you define starting or ending node"
+    Range("G10:K10").Select
+    Selection.Merge
+    With Selection
+        .HorizontalAlignment = xlLeft
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 15
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(128, 0, 0)
+        .ThemeFont = xlThemeFontMinor
+    End With
+    
+    'NOTICE PART ENDED HERE
+    
+    Dim num_show As Integer
+    num_show = 20 + size_of_file_to_be_created
+    
+    Range("A1" & ":" & "R" & num_show).Interior.ColorIndex = 45
+    
+    'TABLE PART START HERE
+    
+    'for number of rows in table
+    'Dim number_of_rows As Integer
+    'number_of_rows = Worksheets("Input_edges").Range("L15").Value
+    'size_of_file_to_be_created = number_of_rows
+    
+    'for shape of table
+    'Range("A1:R31").Interior.ColorIndex = 45
+    Range("G12").Select
+    ActiveCell.FormulaR1C1 = "SR. No."
+    Range("H12").Select
+    ActiveCell.FormulaR1C1 = "Starting Index"
+    Range("I12").Select
+    ActiveCell.FormulaR1C1 = "Last Index"
+    Range("J12").Select
+    ActiveCell.FormulaR1C1 = "Weigth of Edge"
+    
+    Columns("G:G").ColumnWidth = 25
+    Columns("H:H").ColumnWidth = 25
+    Columns("I:I").ColumnWidth = 25
+    Columns("J:J").ColumnWidth = 25
+    Range("G12:J12").Select
+    Application.CutCopyMode = False
+    ActiveSheet.ListObjects.Add(xlSrcRange, Range("$G$12:$J$12"), , xlYes).Name = "Table2"
+    
+    
+    'Create autmatic rows for a table
+    Dim num As Integer
+    For num = 1 To number_of_rows Step 1
+        Dim num1 As Integer
+        num1 = num + 12
+        Dim stri As String
+        stri = "G" & num1
+        Range(stri).Select
+        ActiveCell.FormulaR1C1 = num
+        Selection.Font.Size = 18
+        Range(stri).Interior.ColorIndex = 11
+        Range(stri).Font.ColorIndex = 2
+        Range("H" & num1).Select
+        Selection.Font.Size = 18
+        Range("H" & num1).Interior.ColorIndex = 11
+        Range("H" & num1).Font.ColorIndex = 2
+        Range("I" & num1).Select
+        Selection.Font.Size = 18
+        Range("I" & num1).Interior.ColorIndex = 11
+        Range("I" & num1).Font.ColorIndex = 2
+        Range("J" & num1).Select
+        Selection.Font.Size = 18
+        Range("J" & num1).Interior.ColorIndex = 11
+        Range("J" & num1).Font.ColorIndex = 2
+    Next
+    
+    'Design part
+    Range("G12:J12").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 5287936
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlBottom
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    Rows("12:12").RowHeight = 30
+    Range("H13").Select
+
+End Sub
+Sub table_creation_nodes()
+
+    'check whether given input was a valid integer or not
+    Dim run_or_not As Boolean
+    run_or_not = Check_input_no_of_nodes()
+    If run_or_not = False Then
+        Exit Sub
+    End If
+    
+    'this is for create a automatic table for taking nodes values
+    'ACTION DETERMINE STEP
+    
+    'here trying to find whether there is "Nodes_Table" named sheet is present or not. If present and only want to refresh then cell are cleared
+    'if coming again from fill_form then previous would be deleted and new will be created
+    Dim element As Variant
+    
+    If ActiveSheet.Name = "Nodes_Table" Then
+        Sheets("Nodes_Table").Cells.Clear
+        Dim shp As Shape
+        For Each shp In ActiveSheet.Shapes
+            shp.Delete
+        Next shp
+
+    Else
+        'below code is for supress warning of permanent deletion
+        Application.DisplayAlerts = False
+        For Each element In ThisWorkbook.Worksheets
+            If element.Name = "Nodes_Table" Then
+                element.Delete
+                Exit For
+            End If
+        Next
+        Sheets.Add after:=ActiveSheet
+        ActiveSheet.Name = "Nodes_Table"
+        'now warning should be enabled if there is any other warning then we should see those
+        Application.DisplayAlerts = True
+    End If
+    
+    ActiveWindow.DisplayHeadings = False
+    ActiveWindow.DisplayGridlines = False
+    
+    'for number of rows/columns in table
+    Dim number_of_nodes As Integer
+    number_of_nodes = Worksheets("Input_nodes").Range("L15").Value
+    size_of_file_to_be_created = number_of_nodes
+    
+    Rows("4:4").RowHeight = 20
+    Rows("11:11").RowHeight = 20
+    
+
+    'Add refresh button
+    
+    ActiveSheet.Shapes.AddShape(msoShapeRectangle, 279.6, 225 + size_of_file_to_be_created * 15, 60, 30).Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange.TextFrame2.TextRange.ParagraphFormat.Alignment = _
+        msoAlignCenter
+    With Selection.ShapeRange.Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(255, 0, 0)
+        .Solid
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = "REFRESH"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 7). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 7).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    Selection.OnAction = "table_creation_nodes"
+    
+    'button code ended
+    
+    'Add solution button
+    
+    ActiveSheet.Shapes.AddShape(msoShapeRectangle, 440, 225 + size_of_file_to_be_created * 15, 60, 30).Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange.TextFrame2.TextRange.ParagraphFormat.Alignment = _
+        msoAlignCenter
+    With Selection.ShapeRange.Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(255, 0, 0)
+        .Solid
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = "FIND SOLUTION"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 7). _
+        ParagraphFormat
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 7).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    Selection.OnAction = "solution_giver"
+    
+    'button code ended
+    
+    
+    
+    'HEADING PART STARTED HERE
+    
+    Range("G3").Select
+    ActiveCell.FormulaR1C1 = "::  ENTER VALUES FOR WEIGHT OF EDGES  ::"
+    Range("G3:P3").Select
+    Selection.Merge
+    With Selection
+        .HorizontalAlignment = xlLeft
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 20
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 255, 255)
+        .ThemeFont = xlThemeFontMinor
+    End With
+    
+    'HEADING ENDED HERE
+    
+    
+    
+    'NOTICE PART STARTED HERE
+    
+    'NOTICE HEADING
+    Range("G6").Select
+    ActiveCell.FormulaR1C1 = "NOTE :"
+    Range("G6:P6").Select
+    Selection.Merge
+    With Selection
+        .HorizontalAlignment = xlLeft
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 15
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(128, 0, 0)
+        .ThemeFont = xlThemeFontMinor
+    End With
+    
+    'NOTICE 1
+    Range("G7").Select
+    ActiveCell.FormulaR1C1 = "1. Leave cell blank if there is no edge present inbetween the nodes"
+    Range("G7:P7").Select
+    Selection.Merge
+    With Selection
+        .HorizontalAlignment = xlLeft
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 15
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(128, 0, 0)
+        .ThemeFont = xlThemeFontMinor
+    End With
+    
+    'NOTICE 2
+    Range("G8").Select
+    ActiveCell.FormulaR1C1 = "2. No need to fill diagonal cell."
+    Range("G8:P8").Select
+    Selection.Merge
+    With Selection
+        .HorizontalAlignment = xlLeft
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 15
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(128, 0, 0)
+        .ThemeFont = xlThemeFontMinor
+    End With
+    
+    'NOTICE 3
+    Range("G9").Select
+    '3. Prim's Algorithm is applicable for non-directional edges hence it does not matter which is a starting node or ending node so it's your choice that whom you define starting or ending node.
+    ActiveCell.FormulaR1C1 = "3. Prim's Algorithm is applicable for non-directional edges so it does not matter "
+    Range("G9:P9").Select
+    Selection.Merge
+    With Selection
+        .HorizontalAlignment = xlLeft
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 15
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(128, 0, 0)
+        .ThemeFont = xlThemeFontMinor
+    End With
+    
+    Range("G10").Select
+    '3. Prim's Algorithm is applicable for non-directional edges hence it does not matter which is a starting node or ending node so it's your choice that whom you define starting or ending node.
+    ActiveCell.FormulaR1C1 = "starting node or ending node hence fill either upper half or lower half of diagonal of the matrix."
+    Range("G10:R10").Select
+    Selection.Merge
+    With Selection
+        .HorizontalAlignment = xlLeft
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 15
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(128, 0, 0)
+        .ThemeFont = xlThemeFontMinor
+    End With
+    
+    'NOTICE PART ENDED HERE
+    
+    Dim num_show As Integer
+    num_show = 20 + size_of_file_to_be_created
+    
+    Range("A1" & ":" & "AF" & num_show).Interior.ColorIndex = 45
+    
+    'TABLE PART START HERE
+
+    
+    Range("G12").Select
+    ActiveCell.FormulaR1C1 = "Node/Node"
+    Columns("G:G").ColumnWidth = 18
+    Rows("12:12").RowHeight = 18
+    'Create autmatic rows for a table
+    Dim num As Integer, num1 As Integer, num2 As Integer, num3 As Integer, str_no As String
+    For num = 0 To number_of_nodes
+        num1 = num + 12
+        For num2 = 0 To number_of_nodes
+            num3 = Asc("G") + num2
+            str_no = Chr(num3)
+            Range(str_no & num1).Select
+            Selection.Font.Size = 18
+            Selection.HorizontalAlignment = xlCenter
+            Selection.VerticalAlignment = xlCenter
+            Selection.Borders(xlEdgeTop).LineStyle = xlContinuous
+            Selection.Borders(xlEdgeBottom).LineStyle = xlContinuous
+            Selection.Borders(xlEdgeLeft).LineStyle = xlContinuous
+            Selection.Borders(xlEdgeRight).LineStyle = xlContinuous
+            Range(str_no & num1).Interior.ColorIndex = 36
+        Next
+    Next
+    Dim r1 As Integer, c1 As Integer, num4 As Integer
+    For r1 = 1 To number_of_nodes
+        num4 = Asc("G") + r1
+        str_no = Chr(num4)
+        Range(str_no & "12").Select
+        ActiveCell.FormulaR1C1 = r1
+        Range(str_no & "12").Interior.ColorIndex = 3
+        Range(str_no & "12").Font.ColorIndex = 2
+    Next
+    For c1 = 13 To number_of_nodes + 12
+        Range("G" & c1).Select
+        ActiveCell.FormulaR1C1 = c1 - 12
+        Range("G" & c1).Interior.ColorIndex = 3
+        Range("G" & c1).Font.ColorIndex = 2
+    Next
+    Range("G12").Interior.ColorIndex = 50
+    Range("G12").Font.ColorIndex = 2
+    Range("H13").Select
+
+End Sub
+Sub solution_giver()
+    
+    
+    'check whether given input for edge weight was a valid or not
+    Dim run_or_not As Boolean
+    run_or_not = check_input_given_to_matrix_node()
+    If run_or_not = False Then
+        Exit Sub
+    End If
+    
+    ReDim array_pass1(1) As Variant, array_pass2(1) As Variant, array_pass3(1) As Variant
+    Dim num As Integer, num1 As Integer, num2 As Integer, num3 As Integer, str_no As String, number_of_nodes As Integer, temp As Integer, value_hold As Variant, hold_for_this As Integer
+    
+    temp = 0
+    number_of_nodes = size_of_file_to_be_created
+    hold_for_this = size_of_file_to_be_created
+    
+    For num = 1 To number_of_nodes
+        num1 = num + 12
+        For num2 = 1 To number_of_nodes
+            num3 = Asc("G") + num2
+            str_no = Chr(num3)
+            value_hold = Range(str_no & num1).Value
+            If value_hold <> "" And value_hold <> 0 Then
+                temp = temp + 1
+                ReDim Preserve array_pass1(temp) As Variant
+                ReDim Preserve array_pass2(temp) As Variant
+                ReDim Preserve array_pass3(temp) As Variant
+                array_pass1(temp) = num
+                array_pass2(temp) = num2
+                array_pass3(temp) = value_hold
+            End If
+        Next
+    Next
+    
+    ReDim array_pass(temp, 3) As Variant
+    Dim traver As Integer
+    For traver = 1 To temp
+        array_pass(traver, 1) = array_pass1(traver)
+        array_pass(traver, 2) = array_pass2(traver)
+        array_pass(traver, 3) = array_pass3(traver)
+    Next
+    
+    size_of_file_to_be_created = temp
+    
+    ReDim list_of_inputs1(size_of_file_to_be_created, 2) As Variant
+    
+    list_of_inputs1 = select_edges(array_pass)
+    
+    Dim element As Variant
+
+    'below code is for supress warning of permanent deletion
+    Application.DisplayAlerts = False
+    For Each element In ThisWorkbook.Worksheets
+        If element.Name = "Solution_of_nodes" Then
+            element.Delete
+            Exit For
+        End If
+    Next
+    
+    'now warning should be enabled if there is any other warning then we should see those
+    Application.DisplayAlerts = True
+    
+    Sheets.Add after:=ActiveSheet
+    ActiveSheet.Name = "Solution_of_nodes"
+    
+    Dim num_ind As Integer, w As Integer
+    
+    For w = 1 To size_of_file_to_be_created
+        num_ind = 7 + w
+        If list_of_inputs1(w, 1) = -1 Or list_of_inputs1(w, 2) = -1 Then
+            Exit For
+        Else
+            Range("I" & num_ind).Value = "Connect Node " & list_of_inputs1(w, 1) & " To Node " & list_of_inputs1(w, 2)
+            'Range("I" & num_ind).Value = list_of_inputs1(w, 2)
+        End If
+    Next
+    
+    Call design_solution
+    size_of_file_to_be_created = hold_for_this
+End Sub
+
+Function check_validation(List As Variant, list1 As Variant)
+
+ReDim arr(1) As Variant
+Dim a As Integer, b As Integer, c As Integer, d As Integer, target1 As Variant, target2 As Variant, certain_number As Integer, ind As Integer, ind1 As Integer, ind2 As Variant, item As Variant, new_node As Variant, e As Integer, target3 As Variant, target4 As Variant, f As Integer, temp_temp As Integer, g As Integer, h As Integer
+Dim Temp2(2) As Variant
+certain_number = size_of_file_to_be_created
+ind = 0
+ind1 = 0
+arr(1) = -1
+temp_temp = 0
+h = 0
+For a = 1 To certain_number
+    ind1 = 0
+    If List(a, 3) = -1 Then
+        ' no action
+    Else
+        target1 = List(a, 1)
+        target2 = List(a, 2)
+        For b = 1 To certain_number + 1
+            If list1(b) = -1 Then
+            Exit For
+            Else
+                If list1(b) = target1 Then
+                    For c = 1 To certain_number + 1
+                        If list1(c) = target2 Then
+                            List(a, 3) = -1
+                            ind1 = 1
+                            Exit For
+                        ElseIf list1(c) = -1 Then
+                            'arr.append = List(a, 3)
+                            ind = ind + 1
+                            ReDim Preserve arr(ind)
+                            arr(ind) = List(a, 3)
+                            Exit For
+                        End If
+                    Next
+                ElseIf list1(b) = target2 Then
+                    For d = 1 To certain_number + 1
+                        If list1(d) = target1 Then
+                            List(a, 3) = -1
+                            ind1 = 1
+                            Exit For
+                        ElseIf list1(d) = -1 Then
+                            'arr.append = List(a, 3)
+                            ind = ind + 1
+                            ReDim Preserve arr(ind)
+                            arr(ind) = List(a, 3)
+                        End If
+                    Next
+                End If
+            End If
+            If ind1 = 1 Then
+                Exit For
+            End If
+        Next
+    End If
+Next
+
+If arr(1) = -1 Then
+    Temp2(1) = -1
+    Temp2(2) = -1
+    check_validation = Temp2
+    Exit Function
+End If
+
+ind2 = arr(1)
+'msgbox("array is "&)
+For Each item In arr
+    If h > 0 Then
+        If ind2 > item Then
+            ind2 = arr(h)
+        End If
+    End If
+    h = h + 1
+Next
+
+For e = 1 To certain_number
+    If List(e, 3) = ind2 Then
+        target3 = List(e, 1)
+        target4 = List(e, 2)
+        For f = 1 To certain_number + 1
+            If list1(f) = -1 Then
+                Exit For
+            ElseIf list1(f) = target3 Then
+                new_node = target4
+                Temp2(1) = target3
+                Temp2(2) = target4
+                temp_temp = 1
+                List(e, 3) = -1
+                Exit For
+            ElseIf list1(f) = target4 Then
+                new_node = target3
+                Temp2(1) = target3
+                Temp2(2) = target4
+                temp_temp = 1
+                List(e, 3) = -1
+                Exit For
+            End If
+        Next
+    End If
+    If temp_temp = 1 Then
+        Exit For
+    End If
+Next
+
+For g = 1 To certain_number + 1
+    If list1(g) = -1 Then
+        list1(g) = new_node
+        Exit For
+    End If
+Next
+
+check_validation = Temp2
+
+End Function
+
+
+
+Function select_edges(list_of_edges As Variant)
+
+ReDim list_to_be_return(size_of_file_to_be_created, 2) As Variant, Node_selected(size_of_file_to_be_created + 1) As Variant, temp1(2) As Variant
+
+Dim j As Integer, k As Integer
+
+For j = 1 To size_of_file_to_be_created
+    Node_selected(j) = -1
+    list_to_be_return(j, 1) = -1
+    list_to_be_return(j, 2) = -1
+Next
+
+Node_selected(size_of_file_to_be_created + 1) = -1
+
+Node_selected(1) = list_of_edges(1, 1)
+
+If size_of_file_to_be_created < 2 Then
+    list_to_be_return(1, 1) = list_of_edges(1, 1)
+    list_to_be_return(1, 2) = list_of_edges(1, 2)
+    select_edges = list_to_be_return
+
+Else
+    For k = 1 To size_of_file_to_be_created
+        temp1 = check_validation(list_of_edges, Node_selected)
+        If temp1(1) = -1 And temp1(2) = -1 Then
+            Exit For
+        Else
+            list_to_be_return(k, 1) = temp1(1)
+            list_to_be_return(k, 2) = temp1(2)
+        End If
+    Next
+End If
+select_edges = list_to_be_return
+End Function
+
+
+Function collect_info()
+
+ReDim list_of_inputs(size_of_file_to_be_created, 3) As Variant, list_of_inputs1(size_of_file_to_be_created, 2) As Variant
+Dim num_r1 As Integer, i As Integer
+num_r1 = 0
+
+For i = 1 To size_of_file_to_be_created
+    num_r1 = i + 12
+    list_of_inputs(i, 1) = Worksheets("Edges_Table").Range("H" & num_r1).Value
+    list_of_inputs(i, 2) = Worksheets("Edges_Table").Range("I" & num_r1).Value
+    list_of_inputs(i, 3) = Worksheets("Edges_Table").Range("J" & num_r1).Value
+Next
+
+list_of_inputs1 = select_edges(list_of_inputs)
+collect_info = list_of_inputs1
+
+End Function
+
+Sub solution_feeder()
+
+    'check whether given input for edge weight was a valid  or not
+    Dim run_or_not As Boolean
+    run_or_not = check_input_given_to_matrix_edge()
+    If run_or_not = False Then
+        Exit Sub
+    End If
+    
+    ReDim list_of_inputs2(size_of_file_to_be_created, 2) As Variant
+    list_of_inputs2 = collect_info()
+    
+    Dim element As Variant
+
+    'below code is for supress warning of permanent deletion
+    Application.DisplayAlerts = False
+    For Each element In ThisWorkbook.Worksheets
+        If element.Name = "Solution_of_nodes" Then
+            element.Delete
+            Exit For
+        End If
+    Next
+    
+    'now warning should be enabled if there is any other warning then we should see those
+    Application.DisplayAlerts = True
+    
+    Sheets.Add after:=ActiveSheet
+    ActiveSheet.Name = "Solution_of_nodes"
+    Dim num_ind As Integer, w As Integer
+    
+    For w = 1 To size_of_file_to_be_created
+        num_ind = 7 + w
+        If list_of_inputs2(w, 1) = -1 And list_of_inputs2(w, 2) = -1 Then
+            Exit For
+        Else
+            Range("I" & num_ind).Value = "Connect Node " & list_of_inputs2(w, 1) & " To Node " & list_of_inputs2(w, 2)
+            'Range("I" & num_ind).Value = list_of_inputs2(w, 2)
+        End If
+    Next
+    
+    Call design_solution
+    
+End Sub
+
+
+
+'
+'Below function is for the find out the next edge to be taken
+'
+'Function check_validation(List As Variant, list1 As Variant)
+
+'ReDim arr(1) As Variant
+'Dim a As Integer, b As Integer, c As Integer, d As Integer, target1 As Variant, target2 As Variant, certain_number As Integer, ind As Integer, ind1 As Integer, ind2 As Variant, item As Variant, new_node As Variant, e As Integer, target3 As Variant, target4 As Variant, f As Integer, temp_temp As Integer, g As Integer
+'Dim Temp2(2) As Variant
+'certain_number = size_of_file_to_be_created
+'ind = 0
+'ind1 = 0
+'arr(1) = -1
+'temp_temp = 0
+'For a = 1 To certain_number
+'    ind1 = 1
+'    If List(a, 3) = -1 Then
+'        ' no action
+'    Else
+'        target1 = List(a, 1)
+'        target2 = List(a, 2)
+'        For b = 1 To certain_number + 1
+'            If list1(b) = -1 Then
+'            Exit For
+'            Else
+'                If list1(b) = target1 Then
+'                    For c = 1 To certain_number + 1
+'                        If list1(c) = target2 Then
+'                            List(a, 3) = -1
+'                            ind1 = 1
+'                            Exit For
+'                        ElseIf list1(c) = -1 Then
+'                            'arr.append = List(a, 3)
+'                            ind = ind + 1
+'                            ReDim Preserve arr(ind)
+'                            arr(ind) = List(a, 3)
+'                            Exit For
+'                        End If
+'                    Next
+'                ElseIf list1(b) = target2 Then
+'                    For d = 1 To certain_number + 1
+'                        If list1(d) = target1 Then
+'                            List(a, 3) = -1
+'                            ind1 = 1
+'                            Exit For
+'                        ElseIf list1(d) = -1 Then
+'                            'arr.append = List(a, 3)
+'                            ind = ind + 1
+'                            ReDim Preserve arr(ind)
+'                            arr(ind) = List(a, 3)
+'                        End If
+'                    Next
+'                End If
+'            End If
+'            If ind1 = 1 Then
+'                Exit For
+'            End If
+'        Next
+'    End If
+'Next
+'
+'If arr(1) = -1 Then
+'    Temp2(1) = -1
+'    Temp2(2) = -1
+'    check_validation = Temp2
+'End If
+'
+'ind2 = arr(1)
+'For Each item In arr
+'         If item < ind2 Then
+'            ind2 = item
+'        End If
+'Next
+'
+'For e = 1 To certain_number
+'    If List(e, 3) = ind2 Then
+'        target3 = List(e, 1)
+'        target4 = List(e, 2)
+'        For f = 1 To certain_number + 1
+'            If list1(f) = -1 Then
+'                Exit For
+'            ElseIf list1(f) = target3 Then
+'                new_node = target4
+'                Temp2(1) = target3
+'                Temp2(2) = target4
+'                temp_temp = 1
+'                List(e, 3) = -1
+'                Exit For
+'            ElseIf list1(f) = target4 Then
+'                new_node = target3
+'                Temp2(1) = target3
+'                Temp2(2) = target4
+'                temp_temp = 1
+'                List(e, 3) = -1
+'                Exit For
+'            End If
+'        Next
+'    End If
+'    If temp_temp = 1 Then
+'        Exit For
+'    End If
+'Next
+'
+'For g = 1 To certain_number + 1
+'    If list1(g) = -1 Then
+'        list1(g) = new_node
+'        Exit For
+'    End If
+'Next
+'
+'check_validation = Temp2
+'
+'End Function
+'
+Sub Copy_from_workbook_in_edges()
+
+    Dim path_name As Variant, file_name As Variant, total_path As Variant, sheet_name As Variant
+    
+    Dim element As Variant
+
+    'below code is for supress warning of permanent deletion
+    Application.DisplayAlerts = False
+    For Each element In ThisWorkbook.Worksheets
+        If element.Name = "Edges_Table" Then
+            element.Delete
+            Exit For
+        End If
+    Next
+    
+    'now warning should be enabled if there is any other warning then we should see those
+    Application.DisplayAlerts = True
+    
+    Sheets.Add after:=ActiveSheet
+    ActiveSheet.Name = "Edges_Table"
+    
+    path_name = Worksheets("Upload_This_edge").Range("L8").Value
+    file_name = Worksheets("Upload_This_edge").Range("L13").Value
+    sheet_name = Worksheets("Upload_This_edge").Range("L18").Value
+    
+    total_path = path_name + "/" + file_name
+    
+    Workbooks.Open total_path
+    
+    Workbooks(file_name).Worksheets(sheet_name).Range("A1:Z100").Copy ThisWorkbook.Worksheets("Edges_Table").Range("A1:Z100")
+    
+    Workbooks(file_name).Close saveChanges:=True
+    
+    While WorksheetFunction.CountA(Range("A1:A100")) = 0
+        Columns("A:A").Delete
+    Wend
+    
+    While WorksheetFunction.CountA(Range("A1:Z1")) = 0
+        Rows("1:1").Delete
+    Wend
+    
+    ThisWorkbook.Worksheets("Edges_Table").Rows("1:11").Insert
+    ThisWorkbook.Worksheets("Edges_Table").Columns("A:F").Insert
+    
+    Dim var_to As Integer
+    Range("J12").End(xlDown).Select
+    var_to = Split(Selection.Address, "$")(2)
+    
+    size_of_file_to_be_created = var_to - 12
+    
+    'Special Button for solve in error case
+    'START HERE
+    
+    ActiveSheet.Shapes.AddShape(msoShapeRoundedRectangle, 0, 0, 60, 39.6). _
+        Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = "SOLVE"
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Size = 14
+    With Selection.ShapeRange(1).Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(255, 0, 0)
+        .Transparency = 0
+        .Solid
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Reflection.Type = msoReflectionType3
+    Selection.OnAction = "solution_feeder"
+    Range("A5").Select
+    
+    'END HERE
+    
+    Call solution_feeder
+End Sub
+
+Sub Copy_from_workbook_in_nodes()
+
+    Dim path_name As Variant, file_name As Variant, total_path As Variant, sheet_name As Variant
+    
+    Dim element As Variant
+
+    'below code is for supress warning of permanent deletion
+    Application.DisplayAlerts = False
+    For Each element In ThisWorkbook.Worksheets
+        If element.Name = "Nodes_Table" Then
+            element.Delete
+            Exit For
+        End If
+    Next
+    
+    'now warning should be enabled if there is any other warning then we should see those
+    Application.DisplayAlerts = True
+    
+    Sheets.Add after:=ActiveSheet
+    ActiveSheet.Name = "Nodes_Table"
+    
+    path_name = Worksheets("Upload_This_node").Range("L8").Value
+    file_name = Worksheets("Upload_This_node").Range("L13").Value
+    sheet_name = Worksheets("Upload_This_node").Range("L18").Value
+    
+    total_path = path_name + "/" + file_name
+    
+    Workbooks.Open total_path
+    
+    Workbooks(file_name).Worksheets(sheet_name).Range("A1:Z100").Copy ThisWorkbook.Worksheets("Nodes_Table").Range("A1:Z100")
+    
+    Workbooks(file_name).Close saveChanges:=True
+    
+    While WorksheetFunction.CountA(Range("A1:A100")) = 0
+        Columns("A:A").Delete
+    Wend
+    
+    While WorksheetFunction.CountA(Range("A1:Z1")) = 0
+        Rows("1:1").Delete
+    Wend
+    
+    ThisWorkbook.Worksheets("Nodes_Table").Rows("1:11").Insert
+    ThisWorkbook.Worksheets("Nodes_Table").Columns("A:F").Insert
+    
+    Dim var_to As Integer
+    Range("G12").End(xlDown).Select
+    var_to = Split(Selection.Address, "$")(2)
+    
+    size_of_file_to_be_created = var_to - 12
+    
+    'Special Button for solve in error case
+    'START HERE
+    
+    ActiveSheet.Shapes.AddShape(msoShapeRoundedRectangle, 0, 0, 60, 39.6). _
+        Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = "SOLVE"
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Size = 14
+    With Selection.ShapeRange(1).Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(255, 0, 0)
+        .Transparency = 0
+        .Solid
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Reflection.Type = msoReflectionType3
+    Selection.OnAction = "solution_giver"
+    Range("A5").Select
+    
+    'END HERE
+    
+    Call solution_giver
+End Sub
+
+Function design_solution()
+    
+    ActiveWindow.DisplayHeadings = False
+    ActiveWindow.DisplayGridlines = False
+    
+    Rows("3:3").RowHeight = 25
+    Range("J3").Select
+    ActiveCell.FormulaR1C1 = " (: SOLUTION :) "
+    Range("J3:N3").Select
+    Selection.Merge
+    Selection.HorizontalAlignment = xlCenter
+    Selection.VerticalAlignment = xlCenter
+    Selection.Font.Size = 20
+
+    Dim var_to As Integer, this_num As Integer, temp_value As Integer, temp_value1 As Integer, just_check As Integer
+    just_check = 0
+    Range("I8").End(xlDown).Select
+    On Error GoTo abc_
+    var_to = Split(Selection.Address, "$")(2)
+    just_check = 1
+abc_:
+    If just_check = 0 Then
+        var_to = 8
+    End If
+    
+    this_num = var_to - 8
+
+    Dim num_show As Integer
+    num_show = 13 + this_num
+    
+    Range("H1" & ":" & "P" & num_show).Interior.ColorIndex = 45
+    
+    For temp_value = 0 To this_num
+        temp_value1 = temp_value + 8
+        Rows(temp_value1 & ":" & temp_value1).RowHeight = 30
+        Range("I" & temp_value1 & ":" & "O" & temp_value1).Select
+        Selection.Merge
+        Selection.HorizontalAlignment = xlCenter
+        Selection.VerticalAlignment = xlCenter
+        Selection.Font.Size = 15
+    Next
+    ActiveSheet.Shapes.AddShape(msoShapeRoundedRectangle, 0, 0, 141, 39.6). _
+        Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = "DOWNLOAD"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 6). _
+        ParagraphFormat
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 6).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Size = 14
+    With Selection.ShapeRange(1).Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(255, 0, 0)
+        .Solid
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Reflection.Type = msoReflectionType3
+    Selection.OnAction = "download_part"
+    Range("A5").Select
+End Function
+Sub upload_part_edge()
+
+    'make a new sheet
+    Dim element As Variant
+    'below code is for supress warning of permanent deletion
+    Application.DisplayAlerts = False
+    For Each element In ThisWorkbook.Worksheets
+        If element.Name = "Upload_This_edge" Then
+            element.Delete
+            Exit For
+        End If
+    Next
+    Sheets.Add after:=ActiveSheet
+    ActiveSheet.Name = "Upload_This_edge"
+    'now warning should be enabled if there is any other warning then we should see those
+    Application.DisplayAlerts = True
+    'style remove grid lines
+    ActiveWindow.DisplayHeadings = False
+    ActiveWindow.DisplayGridlines = False
+    
+    Range("E1:S24").Interior.ColorIndex = 45
+    
+    'style for page
+    Columns("L:L").ColumnWidth = 30
+    Range("H3:P3").Select
+    Selection.Merge
+    Range("H3:P3").Select
+    ActiveCell.FormulaR1C1 = ": Enter the following data for File to be imported :"
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 18
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 0, 0)
+        .ThemeFont = xlThemeFontMinor
+        .Italic = True
+    End With
+    Range("G6:Q6").Select
+    Selection.Merge
+    Range("G6:Q6").Select
+    ActiveCell.FormulaR1C1 = "Enter location of file (without file name with no '/' at end) :"
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 13
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 255, 255)
+        .ThemeFont = xlThemeFontMinor
+        .Italic = True
+    End With
+    Rows("8:8").RowHeight = 25
+    Range("L8").Select
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    With Selection.Font
+        .Color = RGB(255, 0, 0)
+    End With
+    Range("G11:Q11").Select
+    Selection.Merge
+    Range("G11:Q11").Select
+    ActiveCell.FormulaR1C1 = "Enter the name of file (with proper extension) :"
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 13
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 255, 255)
+        .ThemeFont = xlThemeFontMinor
+        .Italic = True
+    End With
+    Rows("13:13").RowHeight = 25
+    Range("L13").Select
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    With Selection.Font
+        .Color = RGB(255, 0, 0)
+    End With
+    Range("G16:Q16").Select
+    Selection.Merge
+    Range("G16:Q16").Select
+    ActiveCell.FormulaR1C1 = "Enter the name of sheet of file in which data is present :"
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 13
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 255, 255)
+        .ThemeFont = xlThemeFontMinor
+        .Italic = True
+    End With
+    Rows("18:18").RowHeight = 25
+    Range("L18").Select
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    With Selection.Font
+        .Color = RGB(255, 0, 0)
+    End With
+    ActiveSheet.Shapes.AddShape(msoShapeRoundedRectangle, 540, 330, 141, 39.6). _
+        Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = "SUBMIT"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 6). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 6).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Size = 14
+    With Selection.ShapeRange(1).Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(255, 0, 0)
+        .Solid
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Reflection.Type = msoReflectionType3
+    Selection.OnAction = "Copy_from_workbook_in_edges"
+    Range("L8").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .Color = RGB(255, 255, 255)
+    End With
+    Range("L13").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .Color = RGB(255, 255, 255)
+    End With
+    Range("L18").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .Color = RGB(255, 255, 255)
+    End With
+    Range("A1").Select
+
+End Sub
+
+Sub upload_part_node()
+
+    'make a new sheet
+    Dim element As Variant
+    'below code is for supress warning of permanent deletion
+    Application.DisplayAlerts = False
+    For Each element In ThisWorkbook.Worksheets
+        If element.Name = "Upload_This_node" Then
+            element.Delete
+            Exit For
+        End If
+    Next
+    Sheets.Add after:=ActiveSheet
+    ActiveSheet.Name = "Upload_This_node"
+    'now warning should be enabled if there is any other warning then we should see those
+    Application.DisplayAlerts = True
+    'style remove grid lines
+    ActiveWindow.DisplayHeadings = False
+    ActiveWindow.DisplayGridlines = False
+    
+    Range("E1:S24").Interior.ColorIndex = 45
+    
+    'style for page
+    Columns("L:L").ColumnWidth = 30
+    Range("H3:P3").Select
+    Selection.Merge
+    Range("H3:P3").Select
+    ActiveCell.FormulaR1C1 = ": Enter the following data for File to be imported :"
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 18
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 0, 0)
+        .ThemeFont = xlThemeFontMinor
+        .Italic = True
+    End With
+    Range("G6:Q6").Select
+    Selection.Merge
+    Range("G6:Q6").Select
+    ActiveCell.FormulaR1C1 = "Enter location of file (without file name with no '/' at end) :"
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 13
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 255, 255)
+        .ThemeFont = xlThemeFontMinor
+        .Italic = True
+    End With
+    Rows("8:8").RowHeight = 25
+    Range("L8").Select
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    With Selection.Font
+        .Color = RGB(255, 0, 0)
+    End With
+    Range("G11:Q11").Select
+    Selection.Merge
+    Range("G11:Q11").Select
+    ActiveCell.FormulaR1C1 = "Enter the name of file (with proper extension) :"
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 13
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 255, 255)
+        .ThemeFont = xlThemeFontMinor
+        .Italic = True
+    End With
+    Rows("13:13").RowHeight = 25
+    Range("L13").Select
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    With Selection.Font
+        .Color = RGB(255, 0, 0)
+    End With
+    Range("G16:Q16").Select
+    Selection.Merge
+    Range("G16:Q16").Select
+    ActiveCell.FormulaR1C1 = "Enter the name of sheet of file in which data is present :"
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 13
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 255, 255)
+        .ThemeFont = xlThemeFontMinor
+        .Italic = True
+    End With
+    Rows("18:18").RowHeight = 25
+    Range("L18").Select
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    With Selection.Font
+        .Color = RGB(255, 0, 0)
+    End With
+    ActiveSheet.Shapes.AddShape(msoShapeRoundedRectangle, 540, 330, 141, 39.6). _
+        Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = "SUBMIT"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 6). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 6).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Size = 14
+    With Selection.ShapeRange(1).Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(255, 0, 0)
+        .Solid
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Reflection.Type = msoReflectionType3
+    Selection.OnAction = "Copy_from_workbook_in_nodes"
+    Range("L8").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .Color = RGB(255, 255, 255)
+    End With
+    Range("L13").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .Color = RGB(255, 255, 255)
+    End With
+    Range("L18").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .Color = RGB(255, 255, 255)
+    End With
+    Range("A1").Select
+
+End Sub
+
+
+Sub download_part()
+
+    'make a new sheet
+    Dim element As Variant
+    'below code is for supress warning of permanent deletion
+    Application.DisplayAlerts = False
+    For Each element In ThisWorkbook.Worksheets
+        If element.Name = "Download_This" Then
+            element.Delete
+            Exit For
+        End If
+    Next
+    Sheets.Add after:=ActiveSheet
+    ActiveSheet.Name = "Download_This"
+    'now warning should be enabled if there is any other warning then we should see those
+    Application.DisplayAlerts = True
+    'style remove grid lines
+    ActiveWindow.DisplayHeadings = False
+    ActiveWindow.DisplayGridlines = False
+    
+    Range("E1:S21").Interior.ColorIndex = 45
+    
+    'style for page
+    Columns("L:L").ColumnWidth = 30
+    Range("H3:P3").Select
+    Selection.Merge
+    Range("H3:P3").Select
+    ActiveCell.FormulaR1C1 = ": Enter the following data for File to be exported :"
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 18
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 0, 0)
+        .ThemeFont = xlThemeFontMinor
+        .Italic = True
+    End With
+    Range("G6:Q6").Select
+    Selection.Merge
+    Range("G6:Q6").Select
+    ActiveCell.FormulaR1C1 = "Enter location on which you want to download (without file name with no '/' at end) :"
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 13
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 255, 255)
+        .ThemeFont = xlThemeFontMinor
+        .Italic = True
+    End With
+    Rows("8:8").RowHeight = 25
+    Range("L8").Select
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    With Selection.Font
+        .Color = RGB(255, 0, 0)
+    End With
+    Range("G11:Q11").Select
+    Selection.Merge
+    Range("G11:Q11").Select
+    ActiveCell.FormulaR1C1 = "Enter the name you want to give as download file (with proper extension) :"
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection.Font
+        .Name = "Calibri"
+        .Size = 13
+        .Underline = xlUnderlineStyleNone
+        .ThemeColor = xlThemeColorLight1
+        .Color = RGB(255, 255, 255)
+        .ThemeFont = xlThemeFontMinor
+        .Italic = True
+    End With
+    Rows("13:13").RowHeight = 25
+    Range("L13").Select
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = False
+    End With
+    With Selection.Font
+        .Color = RGB(255, 0, 0)
+    End With
+    ActiveSheet.Shapes.AddShape(msoShapeRoundedRectangle, 540, 250, 141, 39.6). _
+        Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = "SUBMIT"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 6). _
+        ParagraphFormat
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 6).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Size = 14
+    With Selection.ShapeRange(1).Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(255, 0, 0)
+        .Solid
+    End With
+    Selection.ShapeRange(1).TextFrame2.TextRange.Font.Reflection.Type = msoReflectionType3
+    Selection.OnAction = "download_file"
+    Range("L8").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .Color = RGB(255, 255, 255)
+    End With
+    Range("L13").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorDark1
+        .Color = RGB(255, 255, 255)
+    End With
+    Range("A1").Select
+
+End Sub
+
+Sub download_file()
+
+    Dim path_line As String, file_name As String
+    path_line = ThisWorkbook.Worksheets("Download_This").Range("L8").Value
+    file_name = ThisWorkbook.Worksheets("Download_This").Range("L13").Value
+    Dim final_a As String
+    final_a = path_line + "/" + file_name
+    ThisWorkbook.Worksheets("Solution_of_nodes").SaveAs final_a
+
+End Sub
+
+Sub Home_Welcome()
+'
+' design_home_page Macro
+'
+' Keyboard Shortcut: Ctrl+j
+'
+    
+    'make a new sheet
+    Dim element As Variant
+    'below code is for supress warning of permanent deletion
+    Application.DisplayAlerts = False
+    For Each element In ThisWorkbook.Worksheets
+        If element.Name = "Home_page" Then
+            element.Delete
+            Exit For
+        End If
+    Next
+    Sheets.Add after:=ActiveSheet
+    ActiveSheet.Name = "Home_page"
+    'now warning should be enabled if there is any other warning then we should see those
+    Application.DisplayAlerts = True
+    'style remove grid lines
+    ActiveWindow.DisplayHeadings = False
+    ActiveWindow.DisplayGridlines = False
+    
+    'design part is starting
+    
+    ActiveSheet.Shapes.AddShape(msoShapeSnip2SameRectangle, 300, 66.6, 558.6, 76.8).Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = "Welcome to the Prim's Algorithm"
+    Selection.ShapeRange.Fill.Visible = msoTrue
+    Selection.ShapeRange.Fill.ForeColor.ObjectThemeColor = msoThemeColorBackground1
+
+    Selection.ShapeRange.ScaleWidth 1.0094043887, msoFalse, msoScaleFromBottomRight
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 31).Font.Shadow.Type = msoShadow30
+    Selection.ShapeRange.ShapeStyle = msoShapeStylePreset4
+
+    ActiveSheet.Shapes.Range(Array("Snip Same Side Corner Rectangle 1")).Select
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 31).Font.Glow
+        .Color.ObjectThemeColor = msoThemeColorAccent3
+        .Color.TintAndShade = 0
+        .Color.Brightness = 0
+        .Transparency = 0.6000000238
+        .Radius = 8
+    End With
+    ActiveSheet.Shapes.Range(Array("Snip Same Side Corner Rectangle 1")).Select
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = _
+        "Welcome to the Prim's Algorithm"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 31). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 21).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorBackground1
+        .Fill.ForeColor.Brightness = -0.25
+        .Fill.Solid
+        .Size = 28
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(22, 10).Font
+        .BaselineOffset = 0
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorBackground1
+        .Fill.ForeColor.Brightness = -0.25
+        .Fill.Solid
+        .Size = 28
+        .Name = "+mn-lt"
+    End With
+    ActiveSheet.Shapes.AddShape(msoShapeChevron, 376.8, 262.8, 384, 71.4).Select
+    Selection.OnAction = "Index_page"
+    Selection.ShapeRange.IncrementLeft -6.6
+    With Selection.ShapeRange.Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(0, 176, 240)
+        .Transparency = 0
+        .Solid
+    End With
+    Selection.ShapeRange.IncrementLeft -6.6
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = "Let's Start" & Chr(13) & "( Click here )"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 12).ParagraphFormat
+        .Alignment = msoAlignLeft
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 12).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorText1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(13, 14).ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignLeft
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(13, 14).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorText1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 12).Font.Size = 24
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters(13, 14).Font.Size = 12
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 26).Font.Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(255, 0, 0)
+        .Solid
+    End With
+    ActiveSheet.Shapes.Range(Array("Snip Same Side Corner Rectangle 1")).Select
+    Selection.ShapeRange.IncrementLeft -3
+    Selection.ShapeRange.IncrementTop -24.6
+    Selection.ShapeRange.IncrementLeft -4.2
+    Selection.ShapeRange.IncrementTop 31.2
+    With Selection.ShapeRange.Fill
+        .Visible = msoTrue
+        .ForeColor.ObjectThemeColor = msoThemeColorAccent2
+        .ForeColor.RGB = RGB(0, 176, 80)
+        .Solid
+    End With
+    Range("A1:Y37").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 49407
+    End With
+    
+    'color change
+    ActiveSheet.Shapes.Range(Array("Snip Same Side Corner Rectangle 1")).Select
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 31).Font.Fill
+        .Visible = msoTrue
+        .ForeColor.ObjectThemeColor = msoThemeColorBackground1
+        .Solid
+    End With
+    
+    Range("A1").Select
+    
+End Sub
+Sub Index_page()
+'
+' Index_page Macro
+'
+
+'
+    'make a new sheet
+    Dim element As Variant
+    'below code is for supress warning of permanent deletion
+    Application.DisplayAlerts = False
+    For Each element In ThisWorkbook.Worksheets
+        If element.Name = "Main_page" Then
+            element.Delete
+            Exit For
+        End If
+    Next
+    Sheets.Add after:=ActiveSheet
+    ActiveSheet.Name = "Main_page"
+    'now warning should be enabled if there is any other warning then we should see those
+    Application.DisplayAlerts = True
+    'style remove grid lines
+    ActiveWindow.DisplayHeadings = False
+    ActiveWindow.DisplayGridlines = False
+    
+    'design part is starting
+    ActiveSheet.Shapes.AddShape(msoShapeFlowchartPunchedTape, 333.6, 30.6, 443.4, 104.4).Select
+    Selection.ShapeRange(1).TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = "SELECT YOUR CHOICE OF INPUT"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 27).Font.Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(255, 0, 0)
+        .Transparency = 0
+        .Solid
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 27). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 6).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.RGB = RGB(255, 0, 0)
+        .Fill.Transparency = 0
+        .Fill.Solid
+        .Size = 20
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(7, 21).Font
+        .BaselineOffset = 0
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.RGB = RGB(255, 0, 0)
+        .Fill.Transparency = 0
+        .Fill.Solid
+        .Size = 20
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange.Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(255, 192, 0)
+        .Transparency = 0
+        .Solid
+    End With
+    With Selection.ShapeRange.Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(146, 208, 80)
+        .Transparency = 0
+        .Solid
+    End With
+    With Selection.ShapeRange.Fill
+        .Visible = msoTrue
+        .ForeColor.RGB = RGB(0, 176, 80)
+        .Transparency = 0
+        .Solid
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 27).Font.Fill
+        .Visible = msoTrue
+        .ForeColor.ObjectThemeColor = msoThemeColorBackground1
+        .Solid
+    End With
+    Selection.ShapeRange.TextFrame2.TextRange.Font.Italic = msoTrue
+    Selection.ShapeRange.TextFrame2.TextRange.Font.Bold = msoTrue
+    Range("F12").Select
+    ActiveSheet.Shapes.AddShape(msoShapeBevel, 95.4, 216.6, 204, 121.2).Select
+    ActiveSheet.Shapes.AddShape(msoShapeBevel, 336, 216.6, 202.2, 120).Select
+    ActiveSheet.Shapes.AddShape(msoShapeBevel, 568.8, 216, 198.6, 119.4).Select
+    ActiveSheet.Shapes.AddShape(msoShapeBevel, 804, 216, 206.6, 119.4).Select
+    ActiveSheet.Shapes.Range(Array("Bevel 2")).Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = _
+        "VALUES IN EDGES FORMAT" & Chr(13) & "( MANUALLY)" & Chr(13) & "Click Here"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 22). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 5).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(6, 17).Font
+        .BaselineOffset = 0
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(23, 12). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(23, 12).Font
+        .BaselineOffset = 0
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(35, 10). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(35, 10).Font
+        .BaselineOffset = 0
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    Selection.ShapeRange.IncrementLeft 1.2
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 22).Font.Size = 14
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters(35, 10).Font.Size = 12
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = _
+        "VALUES IN EDGES FORMAT" & Chr(13) & "( MANUALLY )" & Chr(13) & "Click Here"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 22). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 5).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 14
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(6, 17).Font
+        .BaselineOffset = 0
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 14
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(23, 13). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(23, 13).Font
+        .BaselineOffset = 0
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(36, 10). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(36, 10).Font
+        .BaselineOffset = 0
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 12
+        .Name = "+mn-lt"
+    End With
+    ActiveSheet.Shapes.Range(Array("Bevel 3")).Select
+    ActiveSheet.Shapes.Range(Array("Bevel 2")).Select
+    ActiveSheet.Shapes.Range(Array("Bevel 3")).Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = _
+        "VALUES IN NODES FORMAT" & Chr(13) & "( MANUALLY )" & Chr(13) & "Click Here"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 22). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 22).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 14
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(23, 13). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(23, 1).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(24, 12).Font
+        .BaselineOffset = 0
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(36, 10). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(36, 10).Font
+        .BaselineOffset = 0
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 12
+        .Name = "+mn-lt"
+    End With
+    ActiveSheet.Shapes.Range(Array("Bevel 4")).Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = _
+        "VALUES IN EDGES FORMAT" & Chr(13) & "( FROM OTHER WORKBOOKS )" & Chr(13) & "Click Here"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 23). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 23).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 14
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(24, 25). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(24, 6).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(30, 19).Font
+        .BaselineOffset = 0
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(49, 10). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(49, 10).Font
+        .BaselineOffset = 0
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 12
+        .Name = "+mn-lt"
+    End With
+    ActiveSheet.Shapes.Range(Array("Bevel 5")).Select
+    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+    Selection.ShapeRange(1).TextFrame2.TextRange.Characters.Text = _
+        "VALUES IN NODES FORMAT" & Chr(13) & "( FROM OTHER WORKBOOKS )" & Chr(13) & "Click Here"
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 23). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(1, 23).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 14
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(24, 25). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(24, 25).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 11
+        .Name = "+mn-lt"
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(49, 10). _
+        ParagraphFormat
+        .FirstLineIndent = 0
+        .Alignment = msoAlignCenter
+    End With
+    With Selection.ShapeRange(1).TextFrame2.TextRange.Characters(49, 10).Font
+        .NameComplexScript = "+mn-cs"
+        .NameFarEast = "+mn-ea"
+        .Fill.Visible = msoTrue
+        .Fill.ForeColor.ObjectThemeColor = msoThemeColorLight1
+        .Fill.Solid
+        .Size = 12
+        .Name = "+mn-lt"
+    End With
+    Range("E28").Select
+    ActiveCell.FormulaR1C1 = ": EDGE FORMAT :"
+    Range("E28:I28").Select
+    Selection.Merge
+    With Selection
+        .HorizontalAlignment = xlGeneral
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    Rows("28:28").RowHeight = 25.8
+    Range("E28:I28").Select
+    ActiveCell.FormulaR1C1 = ": EDGE FORMAT :"
+    Range("E31").Select
+    ActiveCell.FormulaR1C1 = "SR. NO."
+    Range("F31").Select
+    ActiveCell.FormulaR1C1 = "Starting Node"
+    Range("G31").Select
+    ActiveCell.FormulaR1C1 = "Ending Node"
+    Range("H31").Select
+    ActiveCell.FormulaR1C1 = "Weight of edge"
+    Range("F32").Select
+    Columns("F:F").ColumnWidth = 10.22
+    Columns("F:F").ColumnWidth = 11.67
+    Columns("G:G").ColumnWidth = 10.89
+    Columns("H:H").ColumnWidth = 12
+    Range("E32").Select
+    ActiveCell.FormulaR1C1 = "1"
+    Range("E33").Select
+    ActiveCell.FormulaR1C1 = "2"
+    Range("E34").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("F32").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("G32").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("H32").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("H33").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("G33").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("F33").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("F34").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("G34").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("H34").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("O28").Select
+    ActiveCell.FormulaR1C1 = "NODE/NODE"
+    Range("O29").Select
+    Columns("O:O").ColumnWidth = 10.67
+    Range("O28").Select
+    ActiveCell.FormulaR1C1 = "NODE/NODE"
+    Range("O28:S28").Select
+    Selection.Merge
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlBottom
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    With Selection
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+        .MergeCells = True
+    End With
+    Range("O28:S28").Select
+    ActiveCell.FormulaR1C1 = ": NODE FORMAT :"
+    Range("O30").Select
+    ActiveCell.FormulaR1C1 = "Node/Node"
+    Range("O31").Select
+    ActiveCell.FormulaR1C1 = "1"
+    Range("O32").Select
+    ActiveCell.FormulaR1C1 = "2"
+    Range("O33").Select
+    ActiveCell.FormulaR1C1 = "3"
+    Range("O34").Select
+    ActiveCell.FormulaR1C1 = "4"
+    Range("P30").Select
+    ActiveCell.FormulaR1C1 = "1"
+    Range("Q30").Select
+    ActiveCell.FormulaR1C1 = "2"
+    Range("R30").Select
+    ActiveCell.FormulaR1C1 = "3"
+    Range("S30").Select
+    ActiveCell.FormulaR1C1 = "4"
+    Range("P31").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("Q31").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("S31").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("R31").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("S32").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("R32").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("Q32").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("P32").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("P33").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("Q33").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("R33").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("S33").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("S34").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("R34").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("Q34").Select
+    ActiveCell.FormulaR1C1 = "."
+    Range("P34").Select
+    ActiveCell.FormulaR1C1 = "."
+    ActiveSheet.Shapes.Range(Array("Bevel 2")).Select
+    Selection.ShapeRange.ScaleWidth 0.9327956989, msoFalse, msoScaleFromTopLeft
+    Selection.ShapeRange.ScaleWidth 0.9855907781, msoFalse, msoScaleFromTopLeft
+    Selection.ShapeRange.ScaleHeight 0.9752475248, msoFalse, msoScaleFromTopLeft
+    ActiveSheet.Shapes.Range(Array("Bevel 3")).Select
+    Selection.ShapeRange.ScaleHeight 0.985, msoFalse, msoScaleFromTopLeft
+    Selection.ShapeRange.ScaleWidth 0.9086021505, msoFalse, msoScaleFromTopLeft
+    ActiveSheet.Shapes.Range(Array("Bevel 4")).Select
+    Selection.ShapeRange.ScaleWidth 0.9745762712, msoFalse, msoScaleFromBottomRight
+    Selection.ShapeRange.ScaleHeight 0.9849246231, msoFalse, _
+        msoScaleFromBottomRight
+    ActiveSheet.Shapes.Range(Array("Bevel 5")).Select
+    Selection.ShapeRange.ScaleWidth 0.9736070381, msoFalse, msoScaleFromTopLeft
+    Selection.ShapeRange.ScaleHeight 0.9899497487, msoFalse, _
+        msoScaleFromBottomRight
+    Range("S7").Select
+    ActiveSheet.Shapes.Range(Array("Flowchart: Punched Tape 1")).Select
+    Selection.ShapeRange.IncrementLeft -32.4
+    Selection.ShapeRange.IncrementTop -1.2
+    Range("S5").Select
+    ActiveSheet.Shapes.Range(Array("Flowchart: Punched Tape 1")).Select
+    Selection.ShapeRange.IncrementLeft 18
+    ActiveSheet.Shapes.Range(Array("Bevel 2")).Select
+    Range("G22").Select
+    ActiveSheet.Shapes.Range(Array("Bevel 2")).Select
+    Selection.ShapeRange.IncrementLeft 15.6
+    Selection.ShapeRange.IncrementTop -0.6
+    ActiveSheet.Shapes.Range(Array("Bevel 4")).Select
+    Selection.ShapeRange.IncrementLeft -16.8
+    Selection.ShapeRange.IncrementTop -1.2
+    Range("A1:X39").Select
+    With Selection.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .Color = 49407
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+    Range("E28:I28").Select
+    With Selection.Font
+        .Color = -16776961
+        .TintAndShade = 0
+    End With
+    Range("E31:H35").Select
+    With Selection.Font
+        .Color = -16776961
+        .TintAndShade = 0
+    End With
+    Range("O28:S28").Select
+    With Selection.Font
+        .Color = -16776961
+        .TintAndShade = 0
+    End With
+    Range("O30:S35").Select
+    With Selection.Font
+        .Color = -16776961
+        .TintAndShade = 0
+    End With
+    Range("E28:I35").Select
+    With Selection.Font
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = 0
+    End With
+    Range("N28:T35").Select
+    With Selection.Font
+        .ThemeColor = xlThemeColorDark1
+        .TintAndShade = 0
+    End With
+    Range("K34").Select
+    ActiveSheet.Shapes.Range(Array("Bevel 2")).Select
+    Selection.OnAction = "No_edges_input"
+    ActiveSheet.Shapes.Range(Array("Bevel 3")).Select
+    Selection.OnAction = "No_node_input"
+    ActiveSheet.Shapes.Range(Array("Bevel 4")).Select
+    Selection.OnAction = "upload_part_edge"
+    ActiveSheet.Shapes.Range(Array("Bevel 5")).Select
+    Selection.OnAction = "upload_part_node"
+    Range("L1").Select
+    
+    'table show
+    Range("D27:I37").Select
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With Selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlMedium
+    End With
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlMedium
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlMedium
+    End With
+    With Selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlMedium
+    End With
+    Selection.Borders(xlInsideVertical).LineStyle = xlNone
+    Selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+    Range("M27:U37").Select
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With Selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .Weight = xlMedium
+    End With
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlMedium
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlMedium
+    End With
+    With Selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .Weight = xlMedium
+    End With
+    Selection.Borders(xlInsideVertical).LineStyle = xlNone
+    Selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+    Range("E31:H34").Select
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With Selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlInsideVertical)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlInsideHorizontal)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    Range("O30:S34").Select
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With Selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlInsideVertical)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlInsideHorizontal)
+        .LineStyle = xlContinuous
+        .Weight = xlThin
+    End With
+    Range("A1").Select
+End Sub
