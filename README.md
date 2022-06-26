@@ -2,7 +2,7 @@
 Transportation lab project : Implementation of Prims Algorithm in VBA.
 
 
-Code written explicitly so no need to use only that particular excel i.e. copy paste copy 
+Code written explicitly so no need to use only that particular excel i.e. copy paste code 
 from module of excel (or from text file provided VBA_Code_Revised.txt) and paste on other excel 
 and set short cut (ctrl + j) to macro named Home_welcome.
 Everything required for putting code in a module is described in first few comment lines 
